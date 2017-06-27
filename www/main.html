@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="img-src * data: filesystem: cdvfile:; default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; connect-src 'self' 'unsafe-inline' 'unsafe-eval' blob: ws: *;">
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    <link rel="stylesheet" href="css/framework7.ios.min.css">
+    <link rel="stylesheet" href="css/framework7-icons.css">
+    <link rel="stylesheet" href="css/framework7.ios.colors.css">
+    <link rel="stylesheet" href="css/my-app.css">
+    <title>APP-TEST</title>
+
+    <style>
+        .panel {
+            background: #e4e4e4;
+        }
+        .toolbar {
+            background: white;
+        } 
+        
+        .mapa {
+            width: auto;
+            height: 96.5%;
+            border-width: 5px;
+            border-color: white;
+            border-style: solid;
+        }
+        .listaFoto{
+            width: :100%;
+            background: white;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            
+        }
+
+    </style>
+</head>
+
+<body onload="geo();">
+
+    <div class="panel-overlay"></div>
+    <div class="panel panel-left panel-reveal">
+        <div class="content-block">
+            <div class="content-block-title"></div>
+            <!-- Inset content block -->
+
+            <div class="content-block inset">
+                <div class="content-block-inner">
+                    <div align="center" class="center">
+                        <img id="fotoPerfil" src="img/logo1.png" width="50px" />
+
+                        <p id="username"><i class="f7-icons color-green" style="font-size:14px; ">person</i></p>
+                        <p id="usermail" style="font-size: 14px;"><i class="f7-icons color-green" style="font-size:14px;">email</i></p>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+
+            <p><a id="cambiarFotoPefil" class="button button-fill color-green button-round">Cambiar foto de Perfil</a></p>
+            <p><a id="cambiarContraseña" class="button button-fill color-green button-round">Cambiar Contraseña</a></p>
+
+
+            <div align="right">
+                <p><a align href="#" class="close-panel color-green">Cerrar</a></p>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <div class="statusbar-overlay"></div>
+
+    <!-- Views -->
+    <div class="views">
+        <!-- Your main view, should have "view-main" class -->
+        <div class="view view-main">
+            <!-- Top Navbar-->
+            <div class="navbar">
+
+
+                <div class="navbar-inner" style="background: white;">
+                    <div class="left">
+                        <a id="infoUsuario" class="link open-panel" data-panel="left">
+                            <i class="f7-icons color-green">person</i>
+                        </a>
+                    </div>
+                    <div class="center">
+                        <a href="#" class="link icon-only"><img src="img/logo1.png" width="40%" /></a>
+                    </div>
+                    <div id="cerrarSesion" class="right">
+                        <a class="">
+                            <i class="f7-icons color-green">logout</i>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="toolbar tabbar tabbar-labels">
+                <div class="toolbar-inner">
+                    <a id="geo" class="tab-link">
+                        <i class="f7-icons color-green">compass</i>
+                        <span class="tabbar-label color-green">Obtener Posisión</span>
+                    </a>
+                    <a id="buscador" class="tab-link">
+                        <i class="f7-icons color-green">search</i>
+                        <span class="tabbar-label color-green">Buscar</span>
+                    </a>
+                    <a id="cam" class="tab-link">
+                        <i class="f7-icons color-green">camera</i>
+                        <span class="tabbar-label color-green">Cámara</span>
+                    </a>
+
+                </div>
+            </div>
+            <!-- Pages container, because we use fixed-through navbar and toolbar, it has additional appropriate classes-->
+            <div class="pages navbar-through toolbar-through">
+                <!-- Page, "data-page" contains page name -->
+                <div data-page="index" class="page">
+                    <!-- Scrollable page content -->
+                    <div class="page-content">
+
+
+
+                        <div id="map" class="mapa"></div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup popup-cambiarContraseña">
+        <div class="content-block-title" align="center">Cambio de Contraseña</div>
+        <div align="center" class="center">
+            <a href="#" class="link icon-only"><img src="img/logo1.png" width="40%" /></a>
+        </div>
+        <div id="ChangePassword" class="list-block">
+            <ul>
+                <!-- Text inputs -->
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon f7-icons color-green" style="width:150px;margin:100 auto;display:block;">lock</i></div>
+                        <div class="item-inner">
+
+
+                            <div class="item-input">
+                                <input id="oldPassword" type="password" placeholder="Contraseña Actual" style="width:200px;margin:0 auto;display:block;">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon f7-icons color-green" style="width:150px;margin:100 auto;display:block;">lock</i></div>
+                        <div class="item-inner">
+
+                            <div class="item-input">
+                                <input id="newPassword" type="password" placeholder="Nueva Contraseña" style="width:200px;margin:0 auto;display:block;">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon f7-icons color-green" style="width:150px;margin:100 auto;display:block;">lock</i></div>
+                        <div class="item-inner">
+
+                            <div class="item-input">
+                                <input id="repeatPassword" type="password" placeholder="Repita Contraseña" style="width:200px;margin:0 auto;display:block;">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+
+
+            </ul>
+        </div>
+
+        <div class="row">
+            <div class="col-10"></div>
+            <div class="col-40">
+                <a id="cancelar" class="button button-big button-fill button-round color-red close-popup">Cancelar</a>
+            </div>
+
+            <div class="col-40">
+                <a id="cambContr" class="button button-big button-fill button-round color-green">Confirmar</a>
+            </div>
+            <div class="col-10"></div>
+        </div>
+
+
+    </div>
+
+
+    <div class="popup popup-elegirFotoPerfil">
+        <div class="navbar">
+
+
+            <div class="navbar-inner" style="background: white;">
+                <div class="left">
+                    <i class="icon icon-back color-green"></i>
+                    <a id="cancelarFotoPerfil" href="#" class="color-green">
+                    Cancelar
+                    </a>
+                </div>
+                <div class="center">
+                    <img id="fotoPerfil" src="img/logo1.png" width="50px" />
+                </div>
+                <div class="right">
+                    <i class="icon icon-back color-white"></i>
+                    <a id="cancelarFotoPerfil" href="#" class="color-white">
+                    Cancelar
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div align="center" class="center">
+            <div class="content-block-title" align="center">Seleccione una foto</div>
+        </div>
+
+        <div align="center" class="lista">
+           
+            <ul class="listaFoto" id="my_lista">
+
+            </ul>
+        </div>
+
+
+    </div>
+
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-3.2.0.min.js"></script>
+    <script type="text/javascript" src="js/framework7.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFkI3pnhhhjLcD-B5fYcknG_cnJi-NQR4&"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+
+
+
+</body>
+
+
+</html>
