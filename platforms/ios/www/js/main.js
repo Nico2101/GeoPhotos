@@ -26,8 +26,10 @@ document.addEventListener('deviceready', function () {
     $('#cancelarFotoPerfil').bind('click', cerrarPopupFotoPefil);
     verficarFotoPerfil();
 
+    
 
 }, false);
+
 
 function obtieneFotosPerfilUsuario() {
     console.log("Paso por aca");
@@ -44,18 +46,13 @@ function obtieneFotosPerfilUsuario() {
                 $("#my_lista").empty();
                 var arrAux = new Array();
                 if (data.length > 0) {
-
                     for (var i = 0; i < data.length; i++) {
                         var html_elemento = "";
                         fn = "seleccionarFoto('" + data[i].path + "')"
-
                         html_elemento += ' <a href="#" class="item-link item-content" onClick="' + fn + '">';
                         html_elemento += '<img src="' + data[i].path + '" width="100"></a>';
-
                         $("#my_lista").append(html_elemento);
                     }
-
-
                 } else {
                     myApp.alert("Usuario no ha establecido una foto de perfil anteriormente, favor elija la opción TOMAR FOTO", "GeoPhotos");
                     myApp.closeModal('.popup-elegirFotoPerfil');
@@ -168,7 +165,7 @@ function tomarFotoPefil() {
 
 
     }, {
-        quality: 40,
+        quality: 25,
         destinationType: navigator.camera.DestinationType.FILE_URI,
         sourceType: navigator.camera.PictureSourceType.CAMERA,
         correctOrientation: true
@@ -201,11 +198,7 @@ function uploadFotoPerfil(imageURI) {
 }
 
 function win2(imageURI) {
-
-
     guardarDatosFotoPerfil(imageURI);
-
-
 }
 
 function fail2(error) {
@@ -216,8 +209,6 @@ function fail2(error) {
         hold: 3000
 
     });
-
-
 }
 
 function guardarDatosFotoPerfil(imageURI) {
@@ -260,10 +251,9 @@ function guardarDatosFotoPerfil(imageURI) {
 
 
 function elegirFotoPerfil() {
-
-    //$(".lista").empty(); borra la lista
-    myApp.popup('.popup-elegirFotoPerfil');
     obtieneFotosPerfilUsuario();
+    setTimeout(myApp.popup('.popup-elegirFotoPerfil'), 1000);
+
 }
 
 function cerrarPopupFotoPefil() {
@@ -305,6 +295,7 @@ function geo() {
             });
 
             myApp.hidePreloader();
+            navigator.vibrate(50);
 
             obtieneDatosFotos(map, email);
 
@@ -559,7 +550,7 @@ function getImage() {
 
 
     }, {
-        quality: 40,
+        quality: 25,
         destinationType: navigator.camera.DestinationType.FILE_URI,
         sourceType: navigator.camera.PictureSourceType.CAMERA,
         correctOrientation: true
@@ -712,3 +703,67 @@ function manejaDatos(map, latitud, longitud, arreglo) {
     setMarkersOnMap(map, latitud, longitud, arregloAux);
 
 }
+
+
+//Segundo plano y Notificacion 
+document.addEventListener("deviceready", onDeviceReady2, false);
+
+function onDeviceReady2() {
+    // Register the event listener
+    //Notification
+    cordova.plugins.notification.local.hasPermission(function (granted) {
+        console.log("permisos: " + granted);
+        if (!granted) {
+            cordova.plugins.notification.local.registerPermission(function () {});
+        } else {
+            cordova.plugins.notification.local.cancelAll(function () {}, this);
+        }
+
+    });
+
+    document.addEventListener("resume", notificacion, false);
+}
+
+
+function notificacion() {
+    cordova.plugins.notification.local.hasPermission(function (granted) {
+        if (granted) {
+            cordova.plugins.backgroundMode.enable();
+            cordova.plugins.backgroundMode.on('activate', function () {
+                console.log("Entre a segundo plano...");
+                var total = 0;
+                var seg = 5;
+                total = seg * 1000;
+                var now = new Date().getTime();
+                total = now + total;
+                var min_from_now = new Date(total);
+
+                setTimeout(function () {
+                    console.log('tiempo cumplido');
+
+                }, total);
+                cordova.plugins.notification.local.schedule({
+                    id: 1,
+                    title: 'GeoPhotos',
+                    text: 'Continúa distrutando de la aplicación',
+                    at: min_from_now
+                });
+            });
+
+            cordova.plugins.backgroundMode.on('deactivate', function () {
+                cordova.plugins.notification.local.clear(1, function () {});
+                cordova.plugins.notification.local.cancel(1, function () {});
+                geo();
+                myApp.addNotification({
+                    title: "GeoPhotos",
+                    message: "Que bien que estés de vuelta",
+                    hold: 3000
+
+                });
+            });
+        }
+    });
+}
+
+
+

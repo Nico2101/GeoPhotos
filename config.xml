@@ -118,4 +118,6 @@
         <variable name="CAMERA_USAGE_DESCRIPTION" value=" " />
         <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value=" " />
     </plugin>
+    <plugin name="de.appplant.cordova.plugin.local-notification" spec="~0.8.5" />
+    <plugin name="cordova-plugin-background-mode" spec="~0.7.2" />
 </widget>

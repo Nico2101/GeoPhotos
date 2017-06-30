@@ -68,6 +68,7 @@ function enviar() {
     var contrasena = $('#pass').val();
 
 
+
     if (email.length > 0 && contrasena.length > 0) {
 
         myApp.showPreloader('Iniciando sesión...');
@@ -100,7 +101,17 @@ function enviar() {
 
         });
     } else {
-        myApp.alert('Debe Ingresar los datos solicitados', 'GeoPhotos');
+        if ($('#user').val() == "" && $('#pass').val() == "") {
+            myApp.alert('Debe Ingresar su E-mail y Contraseña', 'GeoPhotos');
+        } else {
+            if ($('#user').val() == "") {
+                myApp.alert('Debe Ingresar su E-mail', 'GeoPhotos');
+            }
+            if ($('#pass').val() == "") {
+                myApp.alert('Debe Ingresar su contraseña', 'GeoPhotos');
+            }
+        }
+
     }
 }
 
@@ -154,7 +165,7 @@ function registrar() {
 
                     myApp.closeModal(".popup-registro");
                 } else {
-                    
+
                     myApp.alert("Error, el email ingresado ya se encuentra registrado en la aplicación", "GeoPhotos");
                 }
 
@@ -164,7 +175,6 @@ function registrar() {
             }
         });
     }
-
 }
 
 
@@ -207,3 +217,4 @@ function cerrarApp() {
         navigator.app.exitApp();
     });
 }
+

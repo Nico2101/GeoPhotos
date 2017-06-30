@@ -68,6 +68,7 @@ function enviar() {
     var contrasena = $('#pass').val();
 
 
+
     if (email.length > 0 && contrasena.length > 0) {
 
         myApp.showPreloader('Iniciando sesión...');
@@ -100,7 +101,17 @@ function enviar() {
 
         });
     } else {
-        myApp.alert('Debe Ingresar los datos solicitados', 'GeoPhotos');
+        if ($('#user').val() == "" && $('#pass').val() == "") {
+            myApp.alert('Debe Ingresar su E-mail y Contraseña', 'GeoPhotos');
+        } else {
+            if ($('#user').val() == "") {
+                myApp.alert('Debe Ingresar su E-mail', 'GeoPhotos');
+            }
+            if ($('#pass').val() == "") {
+                myApp.alert('Debe Ingresar su contraseña', 'GeoPhotos');
+            }
+        }
+
     }
 }
 
@@ -154,7 +165,7 @@ function registrar() {
 
                     myApp.closeModal(".popup-registro");
                 } else {
-                    
+
                     myApp.alert("Error, el email ingresado ya se encuentra registrado en la aplicación", "GeoPhotos");
                 }
 
@@ -164,7 +175,6 @@ function registrar() {
             }
         });
     }
-
 }
 
 
@@ -205,5 +215,65 @@ function onDeviceReady() {
 function cerrarApp() {
     myApp.confirm('¿Está seguro que desea cerrar la aplicación?', 'GeoPhotos', function () {
         navigator.app.exitApp();
+    });
+}
+
+
+//Segundo plano y Notificacion 
+document.addEventListener("deviceready", onDeviceReady2, false);
+
+function onDeviceReady2() {
+    // Register the event listener
+    //Notification
+    cordova.plugins.notification.local.hasPermission(function (granted) {
+        console.log("permisos: " + granted);
+        if (!granted) {
+            cordova.plugins.notification.local.registerPermission(function () {});
+        } else {
+            cordova.plugins.notification.local.cancelAll(function () {}, this);
+        }
+
+    });
+
+    document.addEventListener("resume", notificacion, false);
+}
+
+
+function notificacion() {
+    cordova.plugins.notification.local.hasPermission(function (granted) {
+        if (granted) {
+            cordova.plugins.backgroundMode.enable();
+            cordova.plugins.backgroundMode.on('activate', function () {
+                console.log("Entre a segundo plano...");
+                var total = 0;
+                var seg = 5;
+                total = seg * 1000;
+                var now = new Date().getTime();
+                total = now + total;
+                var min_from_now = new Date(total);
+
+                setTimeout(function () {
+                    console.log('tiempo cumplido');
+
+                }, total);
+                cordova.plugins.notification.local.schedule({
+                    id: 1,
+                    title: 'GeoPhotos',
+                    text: 'No haz iniciado sesión en la aplicación',
+                    at: min_from_now
+                });
+            });
+
+            cordova.plugins.backgroundMode.on('deactivate', function () {
+                cordova.plugins.notification.local.clear(1, function () {});
+                cordova.plugins.notification.local.cancel(1, function () {});
+                myApp.addNotification({
+                    title: "GeoPhotos",
+                    message: "Que bien que estés de vuelta, inicia sesion para disfrutar de la aplicación",
+                    hold: 3000
+
+                });
+            });
+        }
     });
 }
