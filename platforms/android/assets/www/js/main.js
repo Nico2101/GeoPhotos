@@ -26,8 +26,6 @@ document.addEventListener('deviceready', function () {
     $('#cancelarFotoPerfil').bind('click', cerrarPopupFotoPefil);
     verficarFotoPerfil();
 
-    
-
 }, false);
 
 
@@ -54,8 +52,8 @@ function obtieneFotosPerfilUsuario() {
                         $("#my_lista").append(html_elemento);
                     }
                 } else {
-                    myApp.alert("Usuario no ha establecido una foto de perfil anteriormente, favor elija la opción TOMAR FOTO", "GeoPhotos");
                     myApp.closeModal('.popup-elegirFotoPerfil');
+                    myApp.alert("Usuario no ha establecido una foto de perfil anteriormente, favor elija la opción TOMAR FOTO", "GeoPhotos");
                 }
 
             },
@@ -161,7 +159,10 @@ function cambiarFotoPerfil() {
 function tomarFotoPefil() {
     // Retrieve image file location from specified source
     navigator.camera.getPicture(uploadFotoPerfil, function (message) {
-        myApp.alert("Error al tomar la fotografía", "GeoPhotos");
+        if(CaptureError.CAPTURE_NO_MEDIA_FILES){  
+        }else{
+            myApp.alert("Error al tomar la fotografía", "GeoPhotos");
+        }
 
 
     }, {
@@ -189,8 +190,6 @@ function uploadFotoPerfil(imageURI) {
 
         var ft = new FileTransfer();
         ft.upload(imageURI, "http://colvin.chillan.ubiobio.cl:8070/npfuente/uploadFotoPerfil.php", win2(imageURI), fail2, options);
-
-
 
     } else {
         myApp.alert("No hay fotografía", "GeoPhotos");
@@ -249,10 +248,9 @@ function guardarDatosFotoPerfil(imageURI) {
     }
 }
 
-
 function elegirFotoPerfil() {
     obtieneFotosPerfilUsuario();
-    setTimeout(myApp.popup('.popup-elegirFotoPerfil'), 1000);
+    myApp.popup('.popup-elegirFotoPerfil');
 
 }
 
@@ -260,7 +258,6 @@ function cerrarPopupFotoPefil() {
     $("#my_lista").empty();
     myApp.closeModal('.popup-elegirFotoPerfil');
 }
-
 
 function geo() {
     var email = localStorage.getItem('usermail');
@@ -546,7 +543,11 @@ function obtieneDatosFotos(map, email) {
 function getImage() {
     // Retrieve image file location from specified source
     navigator.camera.getPicture(uploadPhoto, function (message) {
-        myApp.alert("Error al tomar la fotografía", "GeoPhotos");
+        if(CaptureError.CAPTURE_NO_MEDIA_FILES){  
+        }else{
+            myApp.alert("Error al tomar la fotografía", "GeoPhotos");
+        }
+        
 
 
     }, {
@@ -702,67 +703,6 @@ function manejaDatos(map, latitud, longitud, arreglo) {
 
     setMarkersOnMap(map, latitud, longitud, arregloAux);
 
-}
-
-
-//Segundo plano y Notificacion 
-document.addEventListener("deviceready", onDeviceReady2, false);
-
-function onDeviceReady2() {
-    // Register the event listener
-    //Notification
-    cordova.plugins.notification.local.hasPermission(function (granted) {
-        console.log("permisos: " + granted);
-        if (!granted) {
-            cordova.plugins.notification.local.registerPermission(function () {});
-        } else {
-            cordova.plugins.notification.local.cancelAll(function () {}, this);
-        }
-
-    });
-
-    document.addEventListener("resume", notificacion, false);
-}
-
-
-function notificacion() {
-    cordova.plugins.notification.local.hasPermission(function (granted) {
-        if (granted) {
-            cordova.plugins.backgroundMode.enable();
-            cordova.plugins.backgroundMode.on('activate', function () {
-                console.log("Entre a segundo plano...");
-                var total = 0;
-                var seg = 5;
-                total = seg * 1000;
-                var now = new Date().getTime();
-                total = now + total;
-                var min_from_now = new Date(total);
-
-                setTimeout(function () {
-                    console.log('tiempo cumplido');
-
-                }, total);
-                cordova.plugins.notification.local.schedule({
-                    id: 1,
-                    title: 'GeoPhotos',
-                    text: 'Continúa distrutando de la aplicación',
-                    at: min_from_now
-                });
-            });
-
-            cordova.plugins.backgroundMode.on('deactivate', function () {
-                cordova.plugins.notification.local.clear(1, function () {});
-                cordova.plugins.notification.local.cancel(1, function () {});
-                geo();
-                myApp.addNotification({
-                    title: "GeoPhotos",
-                    message: "Que bien que estés de vuelta",
-                    hold: 3000
-
-                });
-            });
-        }
-    });
 }
 
 
